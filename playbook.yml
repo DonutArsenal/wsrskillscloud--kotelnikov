@@ -1,0 +1,60 @@
+---
+#- hosts: 127.0.0.1
+# connection: local
+
+  # tasks:
+    # - name: ssh-loc
+    #script: /ssh.sh
+- hosts: projects
+  tasks:
+   - name: yum update
+     yum:
+       name: '*'
+       state: latest
+   - name: yum install git
+     yum:
+       name:
+         - epel-release 
+         - git
+
+   - name: Firewallport80
+     firewalld: 
+       port: "80/tcp"
+       permanent: yes
+       state: enabled
+   - name: Firewallport8080
+     firewalld: 
+       port: "8080/tcp"
+       permanent: yes
+       state: enabled
+   - name: Firewallport1834
+     firewalld: 
+       port: "1834/tcp"
+       permanent: yes
+       state: enabled
+
+   - name: reload
+     systemd:
+       name: firewalld
+       state: reloaded
+
+       #  - name: sshconf
+       # file:
+         # state: absent
+         # path: "/etc/ssh/sshd_config"
+         # - name: sshconf2
+         #  shell: scp root@192.168.192.53:/etc/ssh/sshd_config
+        
+   - name: create dir
+     file:
+       path: "/skillcloud-nginx"
+       state: directory
+       #- name: local
+     #local_action: git copy https://github.com/Jeniston14/wsr-skillcloud
+
+     #- name: commandsh
+     #command: sh /wsr-skillcloud/docker-compose.sh
+   - name: sshrestart
+     systemd:
+       name: sshd
+       state: reloaded 
